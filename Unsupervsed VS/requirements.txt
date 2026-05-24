@@ -1,0 +1,3 @@
+# Runtime dependencies for the Vercel Flask dashboard.
+# Heavy analysis/model-training packages are kept in requirements-ml.txt.
+Flask>=3.0

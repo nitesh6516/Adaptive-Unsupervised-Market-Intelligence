@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block body %}
+<canvas id="aether-canvas" aria-hidden="true"></canvas>
+<div id="webgl-fallback" class="webgl-fallback" hidden>
+  <div class="fallback-orb" aria-hidden="true"></div>
+</div>
+<div class="noise-layer" aria-hidden="true"></div>
+
+<main id="app-shell" class="app-shell" data-socketio="{{ 'true' if socketio_enabled else 'false' }}">
+  <header class="topbar" aria-label="AETHER controls">
+    <a class="brand-lockup magnetic" href="/" aria-label="AETHER home">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>
+        <strong>AETHER</strong>
+        <small>Multimodal Console</small>
+      </span>
+    </a>
+    <nav class="top-actions" aria-label="Session actions">
+      <span id="connection-pill" class="status-pill" role="status">local room</span>
+      <button id="theme-toggle" class="icon-button magnetic" type="button" aria-label="Toggle theme">
+        <i data-lucide="moon"></i>
+      </button>
+      <button id="perf-toggle" class="icon-button magnetic" type="button" aria-pressed="false" aria-label="Toggle performance mode">
+        <i data-lucide="activity"></i>
+      </button>
+    </nav>
+  </header>
+
+  <section class="orb-stage" aria-labelledby="orb-title">
+    <div id="orb-2d" class="orb-2d" aria-hidden="true">
+      <div class="orb-ring"></div>
+      <div class="orb-core"></div>
+    </div>
+    <div class="orb-caption glass-panel">
+      <p class="eyebrow">active modality</p>
+      <h1 id="orb-title">Text synthesis</h1>
+      <p id="orb-copy">Ask, paste, or stream text into the central neural field.</p>
+    </div>
+    <div class="orb-vitals glass-panel" aria-label="Live system vitals">
+      <span><b id="fps-readout">60</b><small>fps</small></span>
+      <span><b id="latency-readout">18</b><small>ms</small></span>
+      <span><b id="signal-readout">92</b><small>sig</small></span>
+    </div>
+  </section>
+
+  <section class="result-deck" aria-label="Multimodal output">
+    <article id="text-panel" class="result-panel glass-panel is-active" data-panel="text">
+      <div class="panel-heading">
+        <span>terminal stream</span>
+        <button class="icon-button small magnetic" id="clear-output" type="button" aria-label="Clear output">
+          <i data-lucide="trash-2"></i>
+        </button>
+      </div>
+      <div id="terminal-output" class="terminal-output" aria-live="polite">
+        <p><span class="prompt">aether:</span> console armed. choose a modality and send input.</p>
+      </div>
+    </article>
+
+    <article id="image-panel" class="result-panel glass-panel" data-panel="image">
+      <div class="panel-heading"><span>image gallery</span><span class="mini-label">css 3d carousel</span></div>
+      <div id="image-carousel" class="image-carousel" aria-label="Uploaded image carousel">
+        <figure class="carousel-card"><div class="media-surface"></div><figcaption>drop image</figcaption></figure>
+        <figure class="carousel-card"><div class="media-surface alt"></div><figcaption>analyze layers</figcaption></figure>
+        <figure class="carousel-card"><div class="media-surface pulse"></div><figcaption>annotate</figcaption></figure>
+      </div>
+      <div id="annotation-stack" class="annotation-stack" aria-live="polite"></div>
+    </article>
+
+    <article id="audio-panel" class="result-panel glass-panel" data-panel="audio">
+      <div class="panel-heading"><span>audio field</span><span id="recording-state" class="mini-label">idle</span></div>
+      <canvas id="waveform-2d" class="waveform-2d" width="640" height="220" aria-label="Audio waveform fallback"></canvas>
+      <p id="transcript-band" class="transcript-band">transcription waits at the edge of the orb.</p>
+    </article>
+
+    <article id="video-panel" class="result-panel glass-panel" data-panel="video">
+      <div class="panel-heading"><span>video projector</span><span class="mini-label">timeline ready</span></div>
+      <div class="video-frame">
+        <video id="video-preview" controls muted playsinline></video>
+      </div>
+      <div class="timeline-rail" aria-hidden="true"><span></span></div>
+      <div id="keyframe-strip" class="keyframe-strip" aria-label="Extracted keyframes"></div>
+    </article>
+  </section>
+
+  <aside id="holo-menu" class="holo-menu" aria-label="Holographic radial menu" hidden>
+    <button class="magnetic" data-holo="share" type="button">share</button>
+    <button class="magnetic" data-holo="export" type="button">export</button>
+    <button class="magnetic" data-holo="focus" type="button">focus</button>
+    <button class="magnetic" data-holo="reset" type="button">reset</button>
+  </aside>
+
+  <section class="command-center glass-panel" aria-label="Multimodal command center">
+    <div class="modality-switcher" role="tablist" aria-label="Choose modality">
+      <button class="modality-button is-active magnetic" type="button" role="tab" aria-selected="true" data-mode="text">
+        <i data-lucide="message-square"></i><span>Text</span>
+      </button>
+      <button class="modality-button magnetic" type="button" role="tab" aria-selected="false" data-mode="image">
+        <i data-lucide="image"></i><span>Image</span>
+      </button>
+      <button class="modality-button magnetic" type="button" role="tab" aria-selected="false" data-mode="audio">
+        <i data-lucide="audio-lines"></i><span>Audio</span>
+      </button>
+      <button class="modality-button magnetic" type="button" role="tab" aria-selected="false" data-mode="video">
+        <i data-lucide="video"></i><span>Video</span>
+      </button>
+    </div>
+
+    <form id="multimodal-form" class="input-grid">
+      <label class="sr-only" for="prompt-input">Multimodal prompt</label>
+      <textarea id="prompt-input" name="prompt" rows="2" placeholder="Ask AETHER to synthesize market signals, media, or a strategy..." autocomplete="off"></textarea>
+
+      <label id="drop-zone" class="drop-zone" for="file-input">
+        <input id="file-input" type="file" accept="image/*,audio/*,video/*">
+        <span class="portal-ring" aria-hidden="true"></span>
+        <span><b>Drop media into portal</b><small>image, audio, or video up to 64MB</small></span>
+      </label>
+
+      <div class="command-actions">
+        <button id="voice-button" class="voice-button magnetic" type="button" aria-pressed="false" aria-label="Record voice input">
+          <i data-lucide="mic"></i>
+          <span class="ripple"></span>
+        </button>
+        <button id="send-button" class="send-button magnetic" type="submit">
+          <i data-lucide="send"></i><span>Transmit</span>
+        </button>
+      </div>
+    </form>
+  </section>
+</main>
+
+<div id="loading-hud" class="loading-hud" role="status" aria-live="polite" hidden>
+  <div class="torus-spinner" aria-hidden="true"><span></span><span></span></div>
+  <p>processing</p>
+</div>
+
+<div id="notification-stack" class="notification-stack" aria-live="polite" aria-atomic="true"></div>
+<noscript>
+  <p class="noscript-warning">AETHER needs JavaScript for the live multimodal interface.</p>
+</noscript>
+{% endblock %}

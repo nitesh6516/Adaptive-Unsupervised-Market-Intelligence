@@ -1,0 +1,20 @@
+html[data-theme="light"] {
+  --bg-start: #f5f7fa;
+  --bg-end: #e4e7f1;
+  --mesh-a: rgba(0, 102, 255, 0.13);
+  --mesh-b: rgba(124, 58, 237, 0.12);
+  --primary: #0066ff;
+  --primary-rgb: 0, 102, 255;
+  --secondary: #7c3aed;
+  --secondary-rgb: 124, 58, 237;
+  --success: #008a55;
+  --error: #cf123a;
+  --text: #1a1a2e;
+  --muted: rgba(26, 26, 46, 0.68);
+  --surface: rgba(255, 255, 255, 0.7);
+  --surface-strong: rgba(255, 255, 255, 0.88);
+  --surface-border: rgba(0, 102, 255, 0.18);
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  --inner-glow: inset 0 1px 0 rgba(255, 255, 255, 0.75), inset 0 0 22px rgba(0, 102, 255, 0.08);
+  --focus: #0066ff;
+}
