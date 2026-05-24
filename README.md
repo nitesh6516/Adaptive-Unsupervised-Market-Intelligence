@@ -254,7 +254,10 @@ vercel --prod
 FileDescriptionmodel_artifact.ptSerialized PyTorch Transformer weightsmetrics_report.jsonFull classification report + training historybacktest_trades.csvEvery simulated trade with entry/exit/P&Lfeature_importance.csvFeature ranking from attention weightsfinancial_data_cache.dbSQLite cache of all OHLCV data fetched
 
 👨‍💻 Team
-NameRoleNitesh KumarML Pipeline, Transformer Model, Unsupervised Modules, DashboardKartik SainiFeature Engineering, Backtesting EngineShivanshu GangwarData Ingestion, Visualization, Frontend Integration
+    Name                                                   Role
+Nitesh Kumar                          ML Pipeline, Transformer Model, Unsupervised Modules, Dashboard
+Kartik Saini                          Feature Engineering, Backtesting Engine
+Shivanshu Gangwar                     Data Ingestion, Visualization, Frontend Integration
 Institution: Lovely Professional University (LPU), Phagwara, Punjab
 Program: B.Tech CSE (AI/ML Specialization)
 Submission: Deep Learning & NLP — Academic Project, 2025
